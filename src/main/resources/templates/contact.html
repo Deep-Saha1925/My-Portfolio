@@ -4,7 +4,6 @@
 
 </head>
     <body >
-
             <!-- Page content-->
             <section class="py-5" th:fragment="contact">
                 <div class="container px-5">
@@ -75,7 +74,88 @@
                     </div>
                 </div>
             </section>
-
+            <script>
+                document.addEventListener("DOMContentLoaded", function () {
+                    const form = document.getElementById("contactForm");
+                    const submitButton = document.getElementById("submitButton");
+            
+                    form.addEventListener("submit", function (event) {
+                        event.preventDefault(); // Prevent default form submission
+            
+                        // Clear previous error messages
+                        const invalidFeedbacks = form.querySelectorAll(".invalid-feedback");
+                        invalidFeedbacks.forEach(feedback => feedback.style.display = "none");
+            
+                        let isValid = true;
+            
+                        // Validate Name
+                        const nameInput = document.getElementById("name");
+                        if (!nameInput.value.trim()) {
+                            isValid = false;
+                            const nameFeedback = form.querySelector("[data-sb-feedback='name:required']");
+                            nameFeedback.style.display = "block";
+                        }
+            
+                        // Validate Email
+                        const emailInput = document.getElementById("email");
+                        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                        if (!emailInput.value.trim()) {
+                            isValid = false;
+                            const emailRequiredFeedback = form.querySelector("[data-sb-feedback='email:required']");
+                            emailRequiredFeedback.style.display = "block";
+                        } else if (!emailRegex.test(emailInput.value)) {
+                            isValid = false;
+                            const emailInvalidFeedback = form.querySelector("[data-sb-feedback='email:email']");
+                            emailInvalidFeedback.style.display = "block";
+                        }
+            
+                        // Validate Phone
+                        const phoneInput = document.getElementById("phone");
+                        const phoneRegex = /^(\(\d{3}\)\s|\d{3}-)?\d{3}-\d{4}$/; // Matches (123) 456-7890, 123-456-7890, or 1234567890
+                        if (!phoneInput.value.trim()) {
+                            isValid = false;
+                            const phoneFeedback = form.querySelector("[data-sb-feedback='phone:required']");
+                            phoneFeedback.style.display = "block";
+                        } else if (!phoneRegex.test(phoneInput.value)) {
+                            isValid = false;
+                            const phoneInvalidFeedback = document.createElement("div");
+                            phoneInvalidFeedback.className = "invalid-feedback";
+                            phoneInvalidFeedback.textContent = "Phone number is not valid.";
+                            phoneInput.parentNode.appendChild(phoneInvalidFeedback);
+                            phoneInvalidFeedback.style.display = "block";
+                        }
+            
+                        // Validate Message
+                        const messageInput = document.getElementById("message");
+                        if (!messageInput.value.trim()) {
+                            isValid = false;
+                            const messageFeedback = form.querySelector("[data-sb-feedback='message:required']");
+                            messageFeedback.style.display = "block";
+                        }
+            
+                        if (isValid) {
+                            // Simulate successful form submission
+                            const successMessage = document.getElementById("submitSuccessMessage");
+                            successMessage.classList.remove("d-none");
+            
+                            const errorMessage = document.getElementById("submitErrorMessage");
+                            errorMessage.classList.add("d-none");
+            
+                            console.log("Form submitted successfully!");
+                            form.reset(); // Reset the form
+                        } else {
+                            // Show error message
+                            const errorMessage = document.getElementById("submitErrorMessage");
+                            errorMessage.classList.remove("d-none");
+            
+                            const successMessage = document.getElementById("submitSuccessMessage");
+                            successMessage.classList.add("d-none");
+            
+                            console.log("Form submission failed. Please correct the errors.");
+                        }
+                    });
+                });
+            </script>
 
     </body>
 </html>
