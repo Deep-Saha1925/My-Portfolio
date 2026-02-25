@@ -2,7 +2,9 @@ package com.Deep.Portfolio.controller;
 
 import com.Deep.Portfolio.dto.ContactDto;
 import com.Deep.Portfolio.sevice.EmailService;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
@@ -14,7 +16,7 @@ public class ContactController {
     private EmailService emailService;
 
     @PostMapping("/send-message")
-    public String sendMessage(@RequestBody ContactDto contactDto) {
+    public ResponseEntity<?> sendMessage(@Valid @RequestBody ContactDto contactDto) {
 
         emailService.sendContactMail(
                 contactDto.getName(),
@@ -23,7 +25,7 @@ public class ContactController {
                 contactDto.getMessage()
         );
 
-        return "success";
+        return ResponseEntity.ok("success");
     }
 
 }

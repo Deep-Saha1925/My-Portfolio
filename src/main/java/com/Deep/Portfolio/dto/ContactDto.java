@@ -1,10 +1,20 @@
 package com.Deep.Portfolio.dto;
 
+import jakarta.validation.constraints.*;
+
 public class ContactDto {
 
+    @NotBlank(message = "Name is required")
     private String name;
+
+    @Email(message = "Invalid email")
+    @NotBlank
     private String email;
+
+    @NotBlank(message = "Phone is required")
     private String phone;
+
+    @NotBlank(message = "Message is required")
     private String message;
 
     public ContactDto(String name, String email, String phone, String message) {
