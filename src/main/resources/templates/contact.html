@@ -21,28 +21,28 @@
                     <form id="contactForm">
                         <!-- Name -->
                         <div class="form-floating mb-3">
-                            <input class="form-control" id="name" type="text" placeholder="Enter your name..." />
+                            <input class="form-control" id="name" name="name" type="text" placeholder="Enter your name..." />
                             <label for="name">Full name</label>
                             <div class="invalid-feedback">A name is required.</div>
                         </div>
 
                         <!-- Email -->
                         <div class="form-floating mb-3">
-                            <input class="form-control" id="email" type="email" placeholder="name@example.com" />
+                            <input class="form-control" id="email" name="email" type="email" placeholder="name@example.com" />
                             <label for="email">Email address</label>
                             <div class="invalid-feedback">A valid email is required.</div>
                         </div>
 
                         <!-- Phone -->
                         <div class="form-floating mb-3">
-                            <input class="form-control" id="phone" type="tel" placeholder="(123) 456-7890" />
+                            <input class="form-control" id="phone" name="phone" type="tel" placeholder="(123) 456-7890" />
                             <label for="phone">Phone number</label>
                             <div class="invalid-feedback">A phone number is required.</div>
                         </div>
 
                         <!-- Message -->
                         <div class="form-floating mb-3">
-                            <textarea class="form-control" id="message" placeholder="Enter your message..." style="height: 10rem"></textarea>
+                            <textarea class="form-control" id="message" name="message" placeholder="Enter your message..." style="height: 10rem"></textarea>
                             <label for="message">Message</label>
                             <div class="invalid-feedback">A message is required.</div>
                         </div>
@@ -67,34 +67,109 @@
       const successMsg = document.getElementById("submitSuccessMessage");
       const errorMsg = document.getElementById("submitErrorMessage");
 
-      form.addEventListener("submit", (e) => {
+      form.addEventListener("submit", async (e) => {
         e.preventDefault();
 
-        let isValid = true;
         successMsg.classList.add("d-none");
         errorMsg.classList.add("d-none");
+
+        let isValid = true;
 
         const name = form.name.value.trim();
         const email = form.email.value.trim();
         const phone = form.phone.value.trim();
         const message = form.message.value.trim();
 
-        form.querySelectorAll(".invalid-feedback").forEach(f => f.style.display = "none");
+        // Clear previous invalid states
+        form.querySelectorAll(".form-control").forEach(input => {
+          input.classList.remove("is-invalid");
+        });
 
-        if (!name) { isValid = false; form.querySelector("#name + label + .invalid-feedback").style.display = "block"; }
-        if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { isValid = false; form.querySelector("#email + label + .invalid-feedback").style.display = "block"; }
-        if (!/^[0-9]{7,15}$/.test(phone)) { isValid = false; form.querySelector("#phone + label + .invalid-feedback").style.display = "block"; }
-        if (!message) { isValid = false; form.querySelector("#message + label + .invalid-feedback").style.display = "block"; }
+        // Name validation
+        if (!name) {
+          form.name.classList.add("is-invalid");
+          isValid = false;
+        }
 
-        if (isValid) {
-          successMsg.classList.remove("d-none");
-          form.reset();
-          console.log("Form submitted successfully!");
-        } else {
+        // Email validation
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailRegex.test(email)) {
+          form.email.classList.add("is-invalid");
+          isValid = false;
+        }
+
+        // Phone validation
+        const phoneRegex = /^\+?[0-9\s-]{7,15}$/;
+        if (!phoneRegex.test(phone)) {
+          form.phone.classList.add("is-invalid");
+          isValid = false;
+        }
+
+        // Message validation
+        if (!message) {
+          form.message.classList.add("is-invalid");
+          isValid = false;
+        }
+
+        if (!isValid) return;
+
+        const data = { name, email, phone, message };
+
+        try {
+          const response = await fetch("/send-message", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(data)
+          });
+
+          if (response.ok) {
+            successMsg.classList.remove("d-none");
+            form.reset();
+          } else {
+            errorMsg.classList.remove("d-none");
+          }
+
+        } catch (error) {
           errorMsg.classList.remove("d-none");
         }
       });
     });
 </script>
+
+<!--<script>-->
+<!--    document.addEventListener("DOMContentLoaded", function () {-->
+<!--      const form = document.getElementById("contactForm");-->
+<!--      const successMsg = document.getElementById("submitSuccessMessage");-->
+<!--      const errorMsg = document.getElementById("submitErrorMessage");-->
+
+<!--      form.addEventListener("submit", (e) => {-->
+<!--        e.preventDefault();-->
+
+<!--        let isValid = true;-->
+<!--        successMsg.classList.add("d-none");-->
+<!--        errorMsg.classList.add("d-none");-->
+
+<!--        const name = form.name.value.trim();-->
+<!--        const email = form.email.value.trim();-->
+<!--        const phone = form.phone.value.trim();-->
+<!--        const message = form.message.value.trim();-->
+
+<!--        form.querySelectorAll(".invalid-feedback").forEach(f => f.style.display = "none");-->
+
+<!--        if (!name) { isValid = false; form.querySelector("#name + label + .invalid-feedback").style.display = "block"; }-->
+<!--        if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { isValid = false; form.querySelector("#email + label + .invalid-feedback").style.display = "block"; }-->
+<!--        if (!/^[0-9]{7,15}$/.test(phone)) { isValid = false; form.querySelector("#phone + label + .invalid-feedback").style.display = "block"; }-->
+<!--        if (!message) { isValid = false; form.querySelector("#message + label + .invalid-feedback").style.display = "block"; }-->
+
+<!--        if (isValid) {-->
+<!--          successMsg.classList.remove("d-none");-->
+<!--          form.reset();-->
+<!--          console.log("Form submitted successfully!");-->
+<!--        } else {-->
+<!--          errorMsg.classList.remove("d-none");-->
+<!--        }-->
+<!--      });-->
+<!--    });-->
+<!--</script>-->
 </body>
 </html>
