@@ -17,7 +17,6 @@ public class ContactController {
 
     @PostMapping("/send-message")
     public ResponseEntity<?> sendMessage(@Valid @RequestBody ContactDto contactDto) {
-
         emailService.sendContactMail(
                 contactDto.getName(),
                 contactDto.getEmail(),

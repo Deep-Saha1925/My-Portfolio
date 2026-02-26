@@ -15,9 +15,9 @@ public class EmailService {
 
         SimpleMailMessage mail = new SimpleMailMessage();
 
+        mail.setFrom("portfolio708@gmail.com");
         mail.setTo("yt9889712@gmail.com");
         mail.setSubject("New Contact form submission from " + name);
-
         mail.setReplyTo(email);
 
         mail.setText(
