@@ -1,180 +1,558 @@
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
-<head>
-</head>
+<head></head>
 <body>
-<div th:fragment="projects">
+<div th:fragment="projects" id="pf-root">
+    <style>
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-    <!-- Projects Section-->
-    <section class="py-5">
-        <div class="container px-4 px-lg-5 mb-5">
-            <div class="text-center mb-5">
-                <h1 class="display-5 fw-bolder mb-0">
-                    <span class="text-gradient d-inline">Projects</span>
-                </h1>
+        /* ── DARK (default) ── */
+        #pf-root {
+            --bg: #0a0a0f;
+            --bg-card: #111118;
+            --bg-subtle: #16161f;
+            --accent: #7c6af7;
+            --accent-2: #c084fc;
+            --accent-glow: rgba(124, 106, 247, 0.18);
+            --text: #f0eff8;
+            --text-muted: #8b8a9e;
+            --text-dim: #4a4960;
+            --border: rgba(255,255,255,0.07);
+            --border-accent: rgba(124, 106, 247, 0.35);
+            --cta-bg: #111118;
+            --radius-sm: 8px;
+            --radius: 16px;
+        }
+
+        /* ── LIGHT ── */
+        #pf-root[data-theme="light"] {
+            --bg: #f9f8f6;
+            --bg-card: #ffffff;
+            --bg-subtle: #f0eff9;
+            --accent: #5b4ee0;
+            --accent-2: #9b59c4;
+            --accent-glow: rgba(91, 78, 224, 0.10);
+            --text: #0e0e10;
+            --text-muted: #4a4a58;
+            --text-dim: #9a9aab;
+            --border: rgba(0,0,0,0.09);
+            --border-accent: rgba(91, 78, 224, 0.30);
+            --cta-bg: #f0eff9;
+        }
+
+        #pf-root {
+            background: var(--bg);
+            color: var(--text);
+            font-family: 'Georgia', 'Times New Roman', serif;
+            min-height: 100vh;
+            transition: background 0.3s ease, color 0.3s ease;
+        }
+
+        /* ── THEME TOGGLE ── */
+        .theme-toggle {
+            position: fixed;
+            top: 1.25rem;
+            right: 1.5rem;
+            z-index: 999;
+            width: 44px;
+            height: 26px;
+            background: var(--bg-card);
+            border: 1px solid var(--border-accent);
+            border-radius: 100px;
+            cursor: pointer;
+            padding: 0;
+            transition: background 0.3s, border-color 0.3s;
+            outline: none;
+        }
+
+        .theme-toggle:focus-visible { box-shadow: 0 0 0 3px var(--accent-glow); }
+
+        .theme-toggle-thumb {
+            position: absolute;
+            top: 3px;
+            left: 3px;
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            background: var(--accent);
+            transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), background 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        #pf-root[data-theme="light"] .theme-toggle-thumb { transform: translateX(18px); }
+
+        .icon-moon, .icon-sun { position: absolute; transition: opacity 0.2s; }
+        .icon-moon { opacity: 1; }
+        .icon-sun  { opacity: 0; }
+        #pf-root[data-theme="light"] .icon-moon { opacity: 0; }
+        #pf-root[data-theme="light"] .icon-sun  { opacity: 1; }
+
+        /* ── LAYOUT ── */
+        .pj-wrap {
+            max-width: 960px;
+            margin: 0 auto;
+            padding: 5rem 1.5rem 0;
+        }
+
+        /* ── PAGE HEADER ── */
+        .pj-page-header {
+            margin-bottom: 4rem;
+            padding-bottom: 2rem;
+            border-bottom: 1px solid var(--border);
+            animation: pj-fade 0.6s ease both;
+        }
+
+        .pj-page-title-label {
+            font-family: 'Courier New', monospace;
+            font-size: 11px;
+            letter-spacing: 0.2em;
+            text-transform: uppercase;
+            color: var(--accent);
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+            transition: color 0.3s;
+        }
+
+        .pj-page-title-label::before {
+            content: '';
+            width: 24px;
+            height: 1px;
+            background: var(--accent);
+            transition: background 0.3s;
+        }
+
+        .pj-page-title {
+            font-size: clamp(2.5rem, 5vw, 4rem);
+            font-weight: 400;
+            line-height: 1;
+            letter-spacing: -0.02em;
+            color: var(--text);
+            font-style: italic;
+            transition: color 0.3s;
+        }
+
+        .pj-page-count {
+            font-family: 'Courier New', monospace;
+            font-size: 11px;
+            letter-spacing: 0.1em;
+            color: var(--text-dim);
+            margin-top: 0.75rem;
+            transition: color 0.3s;
+        }
+
+        /* ── PROJECT CARD ── */
+        .pj-card {
+            display: grid;
+            grid-template-columns: 1fr 340px;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            overflow: hidden;
+            margin-bottom: 1.25rem;
+            text-decoration: none;
+            color: inherit;
+            transition: border-color 0.25s, transform 0.25s, background 0.3s;
+            animation: pj-fade 0.6s ease both;
+        }
+
+        .pj-card:nth-child(1) { animation-delay: 0.05s; }
+        .pj-card:nth-child(2) { animation-delay: 0.10s; }
+        .pj-card:nth-child(3) { animation-delay: 0.15s; }
+        .pj-card:nth-child(4) { animation-delay: 0.20s; }
+        .pj-card:nth-child(5) { animation-delay: 0.25s; }
+
+        .pj-card:hover {
+            border-color: var(--border-accent);
+            transform: translateY(-3px);
+        }
+
+        /* ── CARD TEXT SIDE ── */
+        .pj-card-body {
+            padding: 2.25rem 2.5rem;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            gap: 1rem;
+        }
+
+        .pj-card-meta {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .pj-card-number {
+            font-family: 'Courier New', monospace;
+            font-size: 10px;
+            letter-spacing: 0.2em;
+            color: var(--text-dim);
+            transition: color 0.3s;
+        }
+
+        .pj-card-tag {
+            font-family: 'Courier New', monospace;
+            font-size: 10px;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            color: var(--accent);
+            padding: 3px 10px;
+            border: 1px solid var(--border-accent);
+            border-radius: 100px;
+            background: var(--accent-glow);
+            transition: color 0.3s, border-color 0.3s, background 0.3s;
+        }
+
+        .pj-card-title {
+            font-size: 1.35rem;
+            font-weight: 600;
+            color: var(--text);
+            line-height: 1.25;
+            letter-spacing: -0.01em;
+            font-family: 'Courier New', monospace;
+            transition: color 0.3s;
+        }
+
+        .pj-card-desc {
+            font-size: 0.92rem;
+            color: var(--text-muted);
+            line-height: 1.75;
+            transition: color 0.3s;
+        }
+
+        .pj-card-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            font-family: 'Courier New', monospace;
+            font-size: 11px;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            color: var(--accent);
+            margin-top: 0.5rem;
+            transition: gap 0.2s, color 0.3s;
+        }
+
+        .pj-card:hover .pj-card-link { gap: 10px; }
+
+        /* ── CARD IMAGE SIDE ── */
+        .pj-card-img {
+            overflow: hidden;
+            background: var(--bg-subtle);
+            border-left: 1px solid var(--border);
+            transition: border-color 0.3s;
+        }
+
+        .pj-card-img img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            object-position: top center;
+            display: block;
+            filter: grayscale(20%);
+            transition: transform 0.5s ease, filter 0.4s ease;
+        }
+
+        .pj-card:hover .pj-card-img img {
+            transform: scale(1.04);
+            filter: grayscale(0%);
+        }
+
+        /* ── SECTION DIVIDER ── */
+        .pj-section-rule {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin: 3rem 0 1.5rem;
+        }
+
+        .pj-section-rule-text {
+            font-family: 'Courier New', monospace;
+            font-size: 10px;
+            letter-spacing: 0.2em;
+            text-transform: uppercase;
+            color: var(--text-dim);
+            white-space: nowrap;
+            transition: color 0.3s;
+        }
+
+        .pj-section-rule-line {
+            flex: 1;
+            height: 1px;
+            background: var(--border);
+            transition: background 0.3s;
+        }
+
+        /* ── MORE BUTTON ── */
+        .pj-more-wrap {
+            text-align: center;
+            padding: 3rem 0 5rem;
+            animation: pj-fade 0.6s 0.3s ease both;
+        }
+
+        .pj-more-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            padding: 14px 36px;
+            background: transparent;
+            color: var(--text);
+            text-decoration: none;
+            border: 1px solid var(--border);
+            border-radius: var(--radius-sm);
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+            letter-spacing: 0.15em;
+            text-transform: uppercase;
+            transition: border-color 0.2s, background 0.2s, color 0.2s, transform 0.2s;
+        }
+
+        .pj-more-btn svg { width: 14px; height: 14px; fill: currentColor; transition: transform 0.2s; }
+
+        .pj-more-btn:hover {
+            border-color: var(--border-accent);
+            background: var(--accent-glow);
+            color: var(--accent);
+            transform: translateY(-2px);
+        }
+
+        .pj-more-btn:hover svg { transform: translateX(3px); }
+
+        /* ── CTA ── */
+        .pj-cta {
+            background: var(--cta-bg);
+            border-top: 1px solid var(--border);
+            transition: background 0.3s, border-color 0.3s;
+        }
+
+        .pj-cta-inner {
+            max-width: 960px;
+            margin: 0 auto;
+            padding: 6rem 1.5rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 2rem;
+            text-align: center;
+        }
+
+        .pj-cta-label {
+            font-family: 'Courier New', monospace;
+            font-size: 11px;
+            letter-spacing: 0.2em;
+            text-transform: uppercase;
+            color: var(--accent);
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            transition: color 0.3s;
+        }
+
+        .pj-cta-label::before,
+        .pj-cta-label::after {
+            content: '';
+            width: 32px;
+            height: 1px;
+            background: var(--accent);
+            transition: background 0.3s;
+        }
+
+        .pj-cta-heading {
+            font-size: clamp(2rem, 4vw, 3.5rem);
+            font-weight: 400;
+            line-height: 1.1;
+            letter-spacing: -0.02em;
+            color: var(--text);
+            font-style: italic;
+            transition: color 0.3s;
+        }
+
+        .pj-cta-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            padding: 15px 36px;
+            background: var(--accent);
+            color: #fff;
+            text-decoration: none;
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+            letter-spacing: 0.15em;
+            text-transform: uppercase;
+            border-radius: var(--radius-sm);
+            transition: background 0.25s, transform 0.2s;
+        }
+
+        .pj-cta-btn:hover { background: var(--accent-2); transform: translateY(-2px); }
+        .pj-cta-btn .pj-arrow { transition: transform 0.2s; }
+        .pj-cta-btn:hover .pj-arrow { transform: translateX(4px); }
+
+        /* ── ANIMATIONS ── */
+        @keyframes pj-fade {
+            from { opacity: 0; transform: translateY(16px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+
+        /* ── RESPONSIVE ── */
+        @media (max-width: 720px) {
+            .pj-card { grid-template-columns: 1fr; }
+            .pj-card-img {
+                border-left: none;
+                border-top: 1px solid var(--border);
+                height: 220px;
+            }
+            .pj-card-body { padding: 1.5rem; }
+        }
+    </style>
+
+    <!-- THEME TOGGLE -->
+    <button class="theme-toggle" id="themeToggle" aria-label="Toggle theme">
+        <div class="theme-toggle-thumb">
+            <svg class="icon-moon" width="10" height="10" viewBox="0 0 24 24" fill="white"><path d="M21 12.79A9 9 0 1 1 11.21 3a7 7 0 0 0 9.79 9.79z"/></svg>
+            <svg class="icon-sun" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#5b4ee0" stroke-width="2.5" stroke-linecap="round"><circle cx="12" cy="12" r="4"/><line x1="12" y1="2" x2="12" y2="4"/><line x1="12" y1="20" x2="12" y2="22"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="2" y1="12" x2="4" y2="12"/><line x1="20" y1="12" x2="22" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+        </div>
+    </button>
+
+    <!-- PROJECTS SECTION -->
+    <section>
+        <div class="pj-wrap">
+
+            <!-- Page Header -->
+            <div class="pj-page-header">
+                <div class="pj-page-title-label">Work</div>
+                <h1 class="pj-page-title">Projects.</h1>
+                <div class="pj-page-count">05 selected works</div>
             </div>
 
-            <div class="row gx-5 justify-content-center">
-                <div class="col-lg-11 col-xl-9 col-xxl-8">
+            <!-- Section Rule -->
+            <div class="pj-section-rule">
+                <span class="pj-section-rule-text">Featured</span>
+                <div class="pj-section-rule-line"></div>
+            </div>
 
-                    <!-- Project 1 -->
-                    <a th:href="@{https://github.com/Deep-Saha1925/Where-is-my-Bus}"
-                       class="text-decoration-none text-dark"
-                       target="_blank">
-
-                        <div class="card shadow rounded-4 border-0 mb-5 overflow-hidden">
-                            <div class="card-body p-0">
-                                <div class="d-flex flex-column flex-lg-row align-items-center">
-
-                                    <div class="p-4 p-lg-5 text-center text-lg-start">
-                                        <h2 class="fw-bolder fs-4 fs-lg-2">Where is my BUS</h2>
-                                        <p>
-                                            Where Is My Bus (WIMB) is a real-time, route-based bus tracking system
-                                            designed to solve uncertain bus timings and locations.
-                                            It uses dynamic live tracking data and static route data loaded
-                                            from Excel, synchronized with frontend JSON.
-                                        </p>
-                                    </div>
-
-                                    <img class="img-fluid w-100 w-lg-50 mt-3 mt-lg-0"
-                                         th:src="@{/assets/images/Bus_tracking.png}" alt="Bus Tracking"/>
-                                </div>
-                            </div>
-                        </div>
-                    </a>
-
-                    <!-- Project 2 -->
-                    <a th:href="@{https://github.com/Deep-Saha1925/STUDENT-HOUSING}"
-                       class="text-decoration-none text-dark"
-                       target="_blank">
-
-                        <div class="card shadow rounded-4 border-0 mb-5 overflow-hidden">
-                            <div class="card-body p-0">
-                                <div class="d-flex flex-column flex-lg-row align-items-center">
-
-                                    <div class="p-4 p-lg-5 text-center text-lg-start">
-                                        <h2 class="fw-bolder fs-4 fs-lg-2">Smart Student Housing</h2>
-                                        <p>
-                                            A web-based housing platform built with Spring Boot,
-                                            Thymeleaf and MySQL. Students can search and book properties,
-                                            owners manage listings, and admin maintains system integrity.
-                                        </p>
-                                    </div>
-
-                                    <img class="img-fluid w-100 w-lg-50 mt-3 mt-lg-0"
-                                         th:src="@{/assets/images/Smart_Housing.png}" alt="Student Housing"/>
-                                </div>
-                            </div>
-                        </div>
-                    </a>
-
-                    <!-- Project 3 -->
-                    <a th:href="@{https://github.com/Deep-Saha1925/SmartFace-Attendance}"
-                       class="text-decoration-none text-dark"
-                       target="_blank">
-
-                        <div class="card shadow rounded-4 border-0 mb-5 overflow-hidden">
-                            <div class="card-body p-0">
-                                <div class="d-flex flex-column flex-lg-row align-items-center">
-
-                                    <div class="p-4 p-lg-5 text-center text-lg-start">
-                                        <h2 class="fw-bolder fs-4 fs-lg-2">
-                                            Database Management Using Face Recognition
-                                        </h2>
-                                        <p>
-                                            A secure database system integrated with facial recognition.
-                                            It enables biometric authentication and seamless record management
-                                            using advanced recognition algorithms.
-                                        </p>
-                                    </div>
-
-                                    <img class="img-fluid w-100 w-lg-50 mt-3 mt-lg-0"
-                                         th:src="@{/assets/images/p1.jpg}" alt="Face Recognition"/>
-                                </div>
-                            </div>
-                        </div>
-                    </a>
-
-                    <!-- Project 4 -->
-                    <a th:href="@{https://github.com/Deep-Saha1925/Smart-Contact-Manager}"
-                       class="text-decoration-none text-dark"
-                       target="_blank">
-
-                        <div class="card shadow rounded-4 border-0 mb-5 overflow-hidden">
-                            <div class="card-body p-0">
-                                <div class="d-flex flex-column flex-lg-row align-items-center">
-
-                                    <div class="p-4 p-lg-5 text-center text-lg-start">
-                                        <h2 class="fw-bolder fs-4 fs-lg-2">
-                                            SCM (Smart Contact Manager)
-                                        </h2>
-                                        <p>
-                                            A secure Spring Boot application for managing personal
-                                            and business contacts with CRUD operations, search,
-                                            image upload, and role-based access control.
-                                        </p>
-                                    </div>
-
-                                    <img class="img-fluid w-100 w-lg-50 mt-3 mt-lg-0"
-                                         th:src="@{/assets/images/p2.jpg}" alt="SCM"/>
-                                </div>
-                            </div>
-                        </div>
-                    </a>
-
-                    <!-- Project 5 -->
-                    <a th:href="@{https://github.com/Deep-Saha1925/Student_Management_System}"
-                       class="text-decoration-none text-dark"
-                       target="_blank">
-
-                        <div class="card shadow rounded-4 border-0 mb-5 overflow-hidden">
-                            <div class="card-body p-0">
-                                <div class="d-flex flex-column flex-lg-row align-items-center">
-
-                                    <div class="p-4 p-lg-5 text-center text-lg-start">
-                                        <h2 class="fw-bolder fs-4 fs-lg-2">
-                                            Student Management System
-                                        </h2>
-                                        <p>
-                                            A system for managing student records, attendance,
-                                            and performance tracking with an intuitive interface
-                                            for administrators and teachers.
-                                        </p>
-                                    </div>
-
-                                    <img class="img-fluid w-100 w-lg-50 mt-3 mt-lg-0"
-                                         th:src="@{/assets/images/school-management-system.png}" alt="SMS"/>
-                                </div>
-                            </div>
-                        </div>
-                    </a>
-
+            <!-- Project 1 -->
+            <a class="pj-card" th:href="@{https://github.com/Deep-Saha1925/Where-is-my-Bus}" target="_blank">
+                <div class="pj-card-body">
+                    <div class="pj-card-meta">
+                        <span class="pj-card-number">01</span>
+                        <span class="pj-card-tag">Java · Spring Boot</span>
+                    </div>
+                    <div class="pj-card-title">Where is my BUS</div>
+                    <p class="pj-card-desc">Real-time, route-based bus tracking system designed to solve uncertain bus timings. Uses dynamic live tracking data and static route data loaded from Excel, synchronized with frontend JSON.</p>
+                    <span class="pj-card-link">View on GitHub →</span>
                 </div>
-            </div>
+                <div class="pj-card-img">
+                    <img th:src="@{/assets/images/Bus_tracking.png}" alt="Bus Tracking" />
+                </div>
+            </a>
 
-            <!-- See More Button -->
-            <div class="text-center mt-5">
-                <a class="btn btn-outline-dark btn-lg px-5 py-3 fs-5"
-                   target="_blank"
-                   th:href="@{https://github.com/Deep-Saha1925}">
-                    See More
+            <!-- Project 2 -->
+            <a class="pj-card" th:href="@{https://github.com/Deep-Saha1925/STUDENT-HOUSING}" target="_blank">
+                <div class="pj-card-body">
+                    <div class="pj-card-meta">
+                        <span class="pj-card-number">02</span>
+                        <span class="pj-card-tag">Spring Boot · MySQL</span>
+                    </div>
+                    <div class="pj-card-title">Smart Student Housing</div>
+                    <p class="pj-card-desc">Web-based housing platform built with Spring Boot, Thymeleaf and MySQL. Students search and book properties, owners manage listings, and admin maintains system integrity.</p>
+                    <span class="pj-card-link">View on GitHub →</span>
+                </div>
+                <div class="pj-card-img">
+                    <img th:src="@{/assets/images/Smart_Housing.png}" alt="Student Housing" />
+                </div>
+            </a>
+
+            <!-- Project 3 -->
+            <a class="pj-card" th:href="@{https://github.com/Deep-Saha1925/SmartFace-Attendance}" target="_blank">
+                <div class="pj-card-body">
+                    <div class="pj-card-meta">
+                        <span class="pj-card-number">03</span>
+                        <span class="pj-card-tag">Python · OpenCV</span>
+                    </div>
+                    <div class="pj-card-title">Database Management via Face Recognition</div>
+                    <p class="pj-card-desc">Secure database system integrated with facial recognition for biometric authentication and seamless record management using advanced recognition algorithms.</p>
+                    <span class="pj-card-link">View on GitHub →</span>
+                </div>
+                <div class="pj-card-img">
+                    <img th:src="@{/assets/images/p1.jpg}" alt="Face Recognition" />
+                </div>
+            </a>
+
+            <!-- Project 4 -->
+            <a class="pj-card" th:href="@{https://github.com/Deep-Saha1925/Smart-Contact-Manager}" target="_blank">
+                <div class="pj-card-body">
+                    <div class="pj-card-meta">
+                        <span class="pj-card-number">04</span>
+                        <span class="pj-card-tag">Spring Boot · RBAC</span>
+                    </div>
+                    <div class="pj-card-title">SCM — Smart Contact Manager</div>
+                    <p class="pj-card-desc">Secure Spring Boot application for managing personal and business contacts with CRUD operations, search, image upload, and role-based access control.</p>
+                    <span class="pj-card-link">View on GitHub →</span>
+                </div>
+                <div class="pj-card-img">
+                    <img th:src="@{/assets/images/p2.jpg}" alt="SCM" />
+                </div>
+            </a>
+
+            <!-- Project 5 -->
+            <a class="pj-card" th:href="@{https://github.com/Deep-Saha1925/Student_Management_System}" target="_blank">
+                <div class="pj-card-body">
+                    <div class="pj-card-meta">
+                        <span class="pj-card-number">05</span>
+                        <span class="pj-card-tag">Java · MVC</span>
+                    </div>
+                    <div class="pj-card-title">Student Management System</div>
+                    <p class="pj-card-desc">System for managing student records, attendance, and performance tracking with an intuitive interface for administrators and teachers.</p>
+                    <span class="pj-card-link">View on GitHub →</span>
+                </div>
+                <div class="pj-card-img">
+                    <img th:src="@{/assets/images/school-management-system.png}" alt="SMS" />
+                </div>
+            </a>
+
+            <!-- See More -->
+            <div class="pj-more-wrap">
+                <a class="pj-more-btn" th:href="@{https://github.com/Deep-Saha1925}" target="_blank">
+                    <svg viewBox="0 0 24 24"><path d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12"/></svg>
+                    More on GitHub <span class="pj-arrow">→</span>
                 </a>
             </div>
+
         </div>
     </section>
 
-    <!-- Call to Action -->
-    <section class="py-5 bg-gradient-primary-to-secondary text-white">
-        <div class="container px-4 px-lg-5 my-5 text-center">
-            <h2 class="display-6 display-lg-4 fw-bolder mb-4">
-                Let's build something together
-            </h2>
-            <a class="btn btn-outline-light btn-lg px-5 py-3 fs-6 fw-bolder"
-               th:href="@{/contact}">
-                Contact me
+    <!-- CTA -->
+    <section class="pj-cta">
+        <div class="pj-cta-inner">
+            <div class="pj-cta-label">Let's talk</div>
+            <h2 class="pj-cta-heading">Let's build something<br>together.</h2>
+            <a class="pj-cta-btn" th:href="@{/contact}">
+                Contact me <span class="pj-arrow">→</span>
             </a>
         </div>
     </section>
+
+    <script>
+        (function () {
+            var root = document.getElementById('pf-root');
+            var btn  = document.getElementById('themeToggle');
+            var saved = localStorage.getItem('pf-theme');
+            if (saved === 'light') root.setAttribute('data-theme', 'light');
+            btn.addEventListener('click', function () {
+                var isLight = root.getAttribute('data-theme') === 'light';
+                if (isLight) {
+                    root.removeAttribute('data-theme');
+                    localStorage.setItem('pf-theme', 'dark');
+                } else {
+                    root.setAttribute('data-theme', 'light');
+                    localStorage.setItem('pf-theme', 'light');
+                }
+            });
+        })();
+    </script>
 
 </div>
 </body>
