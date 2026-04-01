@@ -165,6 +165,27 @@
             transform: translateY(-1px);
         }
 
+        /* LOADING */
+        .ct-btn.loading {
+            pointer-events: none;
+            opacity: 0.85;
+        }
+
+        .ct-spinner {
+            width: 16px;
+            height: 16px;
+            border: 2px solid rgba(255,255,255,0.3);
+            border-top: 2px solid #fff;
+            border-radius: 50%;
+            display: inline-block;
+            animation: spin 0.6s linear infinite;
+            margin-right: 6px;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
         /* MESSAGES */
         .msg {
             text-align: center;
@@ -198,7 +219,9 @@
                     <input class="ct-input" id="phone" type="tel" placeholder="98765 43210" required />
                     <textarea class="ct-input" id="message" placeholder="Your message" required></textarea>
 
-                    <button class="ct-btn" type="submit">Send Message →</button>
+                    <button class="ct-btn" id="submitBtn" type="submit">
+                        <span id="btnText">Send Message →</span>
+                    </button>
 
                     <div class="msg success" id="successMsg">Message sent successfully!</div>
                     <div class="msg error" id="errorMsg">Error sending message!</div>
@@ -244,9 +267,19 @@
             this.value = value;
         });
 
-        // FORM SUBMIT
+        // FORM SUBMIT WITH LOADING
         document.getElementById("contactForm").addEventListener("submit", async function (e) {
             e.preventDefault();
+
+            const btn = document.getElementById("submitBtn");
+            const btnText = document.getElementById("btnText");
+
+            const successMsg = document.getElementById("successMsg");
+            const errorMsg = document.getElementById("errorMsg");
+
+            // LOADING STATE
+            btn.classList.add("loading");
+            btnText.innerHTML = `<span class="ct-spinner"></span>Sending...`;
 
             const data = {
                 name: document.getElementById("name").value,
@@ -255,23 +288,29 @@
                 message: document.getElementById("message").value
             };
 
-            const successMsg = document.getElementById("successMsg");
-            const errorMsg = document.getElementById("errorMsg");
+            try {
+                const res = await fetch("/send-message", {
+                    method: "POST",
+                    headers: {"Content-Type": "application/json"},
+                    body: JSON.stringify(data)
+                });
 
-            const res = await fetch("/send-message", {
-                method: "POST",
-                headers: {"Content-Type": "application/json"},
-                body: JSON.stringify(data)
-            });
-
-            if (res.ok) {
-                successMsg.style.display = "block";
-                errorMsg.style.display = "none";
-                this.reset();
-            } else {
+                if (res.ok) {
+                    successMsg.style.display = "block";
+                    errorMsg.style.display = "none";
+                    this.reset();
+                } else {
+                    errorMsg.style.display = "block";
+                    successMsg.style.display = "none";
+                }
+            } catch (err) {
                 errorMsg.style.display = "block";
                 successMsg.style.display = "none";
             }
+
+            // RESET BUTTON
+            btn.classList.remove("loading");
+            btnText.innerHTML = "Send Message →";
         });
     </script>
 
