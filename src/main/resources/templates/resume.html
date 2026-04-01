@@ -1,231 +1,499 @@
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head></head>
-
 <body>
-<div class="container px-4 px-lg-5 my-5" th:fragment="resume">
+<div th:fragment="resume" id="pf-root">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-  <div class="text-center mb-5">
-    <h1 class="display-5 fw-bolder mb-0">
-      <span class="text-gradient d-inline">Resume</span>
-    </h1>
-  </div>
+    /* ── DARK (default) ── */
+    #pf-root {
+        --bg: #0a0a0f;
+        --bg-card: #111118;
+        --bg-subtle: #16161f;
+        --bg-pill: #1a1a26;
+        --accent: #7c6af7;
+        --accent-2: #c084fc;
+        --accent-glow: rgba(124, 106, 247, 0.18);
+        --text: #f0eff8;
+        --text-muted: #8b8a9e;
+        --text-dim: #4a4960;
+        --border: rgba(255,255,255,0.07);
+        --border-accent: rgba(124, 106, 247, 0.35);
+        --radius-sm: 8px;
+        --radius: 16px;
+    }
 
-  <div class="row gx-5 justify-content-center">
-    <div class="col-lg-11 col-xl-9 col-xxl-8">
+    /* ── LIGHT ── */
+    #pf-root[data-theme="light"] {
+        --bg: #f9f8f6;
+        --bg-card: #ffffff;
+        --bg-subtle: #f0eff9;
+        --bg-pill: #ededf5;
+        --accent: #5b4ee0;
+        --accent-2: #9b59c4;
+        --accent-glow: rgba(91, 78, 224, 0.10);
+        --text: #0e0e10;
+        --text-muted: #4a4a58;
+        --text-dim: #9a9aab;
+        --border: rgba(0,0,0,0.09);
+        --border-accent: rgba(91, 78, 224, 0.30);
+    }
 
-      <!-- ================= EXPERIENCE ================= -->
-      <section>
+    #pf-root {
+        background: var(--bg);
+        color: var(--text);
+        font-family: 'Georgia', 'Times New Roman', serif;
+        min-height: 100vh;
+        transition: background 0.3s ease, color 0.3s ease;
+        padding: 5rem 1.5rem 6rem;
+    }
 
-        <div class="d-flex flex-column flex-md-row align-items-center justify-content-between mb-4 text-center text-md-start">
-          <h2 class="text-primary fw-bolder mb-3 mb-md-0">Experience</h2>
+    /* ── THEME TOGGLE ── */
+    .theme-toggle {
+        position: fixed;
+        top: 1.25rem;
+        right: 1.5rem;
+        z-index: 999;
+        width: 44px;
+        height: 26px;
+        background: var(--bg-card);
+        border: 1px solid var(--border-accent);
+        border-radius: 100px;
+        cursor: pointer;
+        padding: 0;
+        transition: background 0.3s, border-color 0.3s;
+        outline: none;
+    }
 
-          <a class="btn btn-primary px-4 py-2"
-             href="https://flowcv.com/resume/slvniwl17bak"
-             target="_blank">
-            Download Resume
-          </a>
-        </div>
+    .theme-toggle:focus-visible { box-shadow: 0 0 0 3px var(--accent-glow); }
 
-        <!-- EXPERIENCE CARDS -->
-        <!-- Card Template Updated for Mobile -->
+    .theme-toggle-thumb {
+        position: absolute;
+        top: 3px;
+        left: 3px;
+        width: 18px;
+        height: 18px;
+        border-radius: 50%;
+        background: var(--accent);
+        transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), background 0.3s;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
 
-        <!-- Experience 1 -->
-        <div class="card shadow border-0 rounded-4 mb-4">
-          <div class="card-body p-4 p-lg-5">
-            <div class="row align-items-center gx-4 flex-column flex-lg-row">
+    #pf-root[data-theme="light"] .theme-toggle-thumb { transform: translateX(18px); }
 
-              <div class="col-lg-4 text-center text-lg-start mb-4 mb-lg-0">
-                <div class="bg-light p-4 rounded-4">
-                  <div class="text-primary fw-bolder mb-2">2025</div>
-                  <div class="small fw-bolder">Trainee Technical Assistant</div>
-                  <div class="small text-muted">SILIGURI INSTITUTE OF TECHNOLOGY</div>
-                  <div class="small text-muted">Siliguri, West Bengal</div>
-                </div>
-              </div>
+    .icon-moon, .icon-sun { position: absolute; transition: opacity 0.2s; }
+    .icon-moon { opacity: 1; }
+    .icon-sun  { opacity: 0; }
+    #pf-root[data-theme="light"] .icon-moon { opacity: 0; }
+    #pf-root[data-theme="light"] .icon-sun  { opacity: 1; }
 
-              <div class="col-lg-8 text-center text-lg-start">
-                Assisted in conducting and managing lab sessions for Java,
-                C, Python, DSA and Software Engineering. Gained hands-on
-                experience in troubleshooting and lab management.
-              </div>
+    /* ── PAGE LAYOUT ── */
+    .rs-wrap {
+        max-width: 860px;
+        margin: 0 auto;
+    }
 
-            </div>
-          </div>
-        </div>
+    /* ── PAGE HEADER ── */
+    .rs-page-header {
+        display: flex;
+        align-items: flex-end;
+        justify-content: space-between;
+        margin-bottom: 4rem;
+        padding-bottom: 2rem;
+        border-bottom: 1px solid var(--border);
+        flex-wrap: wrap;
+        gap: 1.5rem;
+        animation: rs-fade 0.6s ease both;
+    }
 
-        <!-- Experience 2 -->
-        <div class="card shadow border-0 rounded-4 mb-4">
-          <div class="card-body p-4 p-lg-5">
-            <div class="row align-items-center gx-4 flex-column flex-lg-row">
+    .rs-page-title-label {
+        font-family: 'Courier New', monospace;
+        font-size: 11px;
+        letter-spacing: 0.2em;
+        text-transform: uppercase;
+        color: var(--accent);
+        margin-bottom: 0.5rem;
+        display: flex;
+        align-items: center;
+        gap: 0.6rem;
+    }
 
-              <div class="col-lg-4 text-center text-lg-start mb-4 mb-lg-0">
-                <div class="bg-light p-4 rounded-4">
-                  <div class="text-primary fw-bolder mb-2">2025</div>
-                  <div class="small fw-bolder">Software Engineer</div>
-                  <div class="small text-muted">ELEVATE LABS</div>
-                  <div class="small text-muted">Bengaluru</div>
-                </div>
-              </div>
+    .rs-page-title-label::before {
+        content: '';
+        width: 24px;
+        height: 1px;
+        background: var(--accent);
+    }
 
-              <div class="col-lg-8 text-center text-lg-start">
-                Built Java-based applications focusing on backend logic,
-                clean architecture and system design.
-              </div>
+    .rs-page-title {
+        font-size: clamp(2.5rem, 5vw, 4rem);
+        font-weight: 400;
+        line-height: 1;
+        letter-spacing: -0.02em;
+        color: var(--text);
+        font-style: italic;
+    }
 
-            </div>
-          </div>
-        </div>
+    .rs-download-btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 12px 24px;
+        background: var(--accent);
+        color: #fff;
+        text-decoration: none;
+        font-family: 'Courier New', monospace;
+        font-size: 11px;
+        letter-spacing: 0.15em;
+        text-transform: uppercase;
+        border-radius: var(--radius-sm);
+        transition: background 0.25s, transform 0.2s;
+        white-space: nowrap;
+    }
 
-        <!-- Experience 3 -->
-        <div class="card shadow border-0 rounded-4 mb-4">
-          <div class="card-body p-4 p-lg-5">
-            <div class="row align-items-center gx-4 flex-column flex-lg-row">
+    .rs-download-btn:hover { background: var(--accent-2); transform: translateY(-2px); }
+    .rs-download-btn svg { width: 13px; height: 13px; fill: currentColor; }
 
-              <div class="col-lg-4 text-center text-lg-start mb-4 mb-lg-0">
-                <div class="bg-light p-4 rounded-4">
-                  <div class="text-primary fw-bolder mb-2">2025</div>
-                  <div class="small fw-bolder">Software Developer</div>
-                  <div class="small text-muted">JPMorgan Chase & Co</div>
-                  <div class="small text-muted">New York, USA</div>
-                </div>
-              </div>
+    /* ── SECTION ── */
+    .rs-section {
+        margin-bottom: 4rem;
+        animation: rs-fade 0.6s ease both;
+    }
 
-              <div class="col-lg-8 text-center text-lg-start">
-                Worked on Kafka streaming, REST API integration,
-                serialization with Jackson and end-to-end testing.
-              </div>
+    .rs-section:nth-child(2) { animation-delay: 0.08s; }
+    .rs-section:nth-child(3) { animation-delay: 0.16s; }
 
-            </div>
-          </div>
-        </div>
+    .rs-section-heading {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        margin-bottom: 1.75rem;
+    }
 
-        <!-- Experience 4 -->
-        <div class="card shadow border-0 rounded-4 mb-5">
-          <div class="card-body p-4 p-lg-5">
-            <div class="row align-items-center gx-4 flex-column flex-lg-row">
+    .rs-section-heading-text {
+        font-family: 'Courier New', monospace;
+        font-size: 11px;
+        letter-spacing: 0.2em;
+        text-transform: uppercase;
+        color: var(--text-dim);
+        white-space: nowrap;
+    }
 
-              <div class="col-lg-4 text-center text-lg-start mb-4 mb-lg-0">
-                <div class="bg-light p-4 rounded-4">
-                  <div class="text-primary fw-bolder mb-2">2024</div>
-                  <div class="small fw-bolder">InternPe</div>
-                  <div class="small text-muted">Java Intern</div>
-                  <div class="small text-muted">Bangalore</div>
-                </div>
-              </div>
+    .rs-section-heading-line {
+        flex: 1;
+        height: 1px;
+        background: var(--border);
+    }
 
-              <div class="col-lg-8 text-center text-lg-start">
-                Built industry-level projects and strengthened
-                software development fundamentals.
-              </div>
+    /* ── TIMELINE CARD ── */
+    .rs-card {
+        display: grid;
+        grid-template-columns: 200px 1fr;
+        gap: 0;
+        background: var(--bg-card);
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+        margin-bottom: 1rem;
+        overflow: hidden;
+        transition: background 0.3s, border-color 0.3s, transform 0.2s;
+    }
 
-            </div>
-          </div>
-        </div>
+    .rs-card:hover {
+        border-color: var(--border-accent);
+        transform: translateY(-2px);
+    }
 
-      </section>
+    .rs-card-sidebar {
+        background: var(--bg-subtle);
+        border-right: 1px solid var(--border);
+        padding: 1.5rem;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        transition: background 0.3s, border-color 0.3s;
+    }
 
-      <!-- ================= EDUCATION ================= -->
-      <section>
-        <h2 class="text-secondary fw-bolder mb-4 text-center text-lg-start">
-          Education
-        </h2>
+    .rs-card-year {
+        font-family: 'Courier New', monospace;
+        font-size: 11px;
+        letter-spacing: 0.15em;
+        color: var(--accent);
+        text-transform: uppercase;
+        margin-bottom: 0.6rem;
+        transition: color 0.3s;
+    }
 
-        <!-- Education Cards Same Responsive Pattern -->
+    .rs-card-role {
+        font-size: 0.95rem;
+        font-weight: 600;
+        color: var(--text);
+        margin-bottom: 0.3rem;
+        line-height: 1.3;
+        font-family: 'Courier New', monospace;
+        letter-spacing: 0.01em;
+        transition: color 0.3s;
+    }
 
-        <div class="card shadow border-0 rounded-4 mb-4">
-          <div class="card-body p-4 p-lg-5">
-            <div class="row align-items-center gx-4 flex-column flex-lg-row">
+    .rs-card-org {
+        font-family: 'Courier New', monospace;
+        font-size: 10px;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+        color: var(--text-dim);
+        margin-bottom: 0.15rem;
+        transition: color 0.3s;
+    }
 
-              <div class="col-lg-4 text-center text-lg-start mb-4 mb-lg-0">
-                <div class="bg-light p-4 rounded-4">
-                  <div class="text-secondary fw-bolder mb-2">
-                    2025 - Present
-                  </div>
-                  <div class="small fw-bolder">MCA - SIT</div>
-                  <div class="small text-muted">
-                    Siliguri, West Bengal
-                  </div>
-                </div>
-              </div>
+    .rs-card-loc {
+        font-family: 'Courier New', monospace;
+        font-size: 10px;
+        letter-spacing: 0.08em;
+        color: var(--text-dim);
+        transition: color 0.3s;
+    }
 
-              <div class="col-lg-8 text-center text-lg-start">
-                Learning real-world development skills with
-                hands-on projects and system design concepts.
-              </div>
+    .rs-card-body {
+        padding: 1.5rem 2rem;
+        display: flex;
+        align-items: center;
+        font-size: 0.95rem;
+        color: var(--text-muted);
+        line-height: 1.75;
+        transition: color 0.3s;
+    }
 
-            </div>
-          </div>
-        </div>
+    /* ── SKILLS SECTION ── */
+    .rs-skills-card {
+        background: var(--bg-card);
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+        padding: 2.5rem;
+        transition: background 0.3s, border-color 0.3s;
+    }
 
-      </section>
+    .rs-skills-group {
+        margin-bottom: 2.5rem;
+    }
 
-      <!-- ================= SKILLS ================= -->
-      <section>
-        <div class="card shadow border-0 rounded-4 mb-5">
-          <div class="card-body p-4 p-lg-5">
+    .rs-skills-group:last-child { margin-bottom: 0; }
 
-            <div class="mb-4 text-center text-lg-start">
-              <h3 class="fw-bolder">
-                                <span class="text-gradient d-inline">
-                                    Professional Skills
-                                </span>
-              </h3>
-            </div>
+    .rs-skills-group-title {
+        font-family: 'Courier New', monospace;
+        font-size: 10px;
+        letter-spacing: 0.2em;
+        text-transform: uppercase;
+        color: var(--accent);
+        margin-bottom: 1rem;
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        transition: color 0.3s;
+    }
 
-            <div class="row row-cols-1 row-cols-sm-2 row-cols-lg-3 g-3">
-              <div class="col">
-                <div class="bg-light rounded-4 p-3 text-center">
-                  Database Management
-                </div>
-              </div>
-              <div class="col">
-                <div class="bg-light rounded-4 p-3 text-center">
-                  Problem Solving
-                </div>
-              </div>
-              <div class="col">
-                <div class="bg-light rounded-4 p-3 text-center">
-                  Web Development
-                </div>
-              </div>
-            </div>
+    .rs-skills-group-title::after {
+        content: '';
+        flex: 1;
+        height: 1px;
+        background: var(--border);
+    }
 
-            <div class="mt-5 text-center text-lg-start">
-              <h3 class="fw-bolder">
-                                <span class="text-gradient d-inline">
-                                    Languages
-                                </span>
-              </h3>
-            </div>
+    .rs-pills {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.6rem;
+    }
 
-            <div class="row row-cols-1 row-cols-sm-2 row-cols-lg-3 g-3 mt-2">
-              <div class="col">
-                <div class="bg-light rounded-4 p-3 text-center">Java</div>
-              </div>
-              <div class="col">
-                <div class="bg-light rounded-4 p-3 text-center">Python</div>
-              </div>
-              <div class="col">
-                <div class="bg-light rounded-4 p-3 text-center">C++</div>
-              </div>
-              <div class="col">
-                <div class="bg-light rounded-4 p-3 text-center">JavaScript</div>
-              </div>
-              <div class="col">
-                <div class="bg-light rounded-4 p-3 text-center">SQL</div>
-              </div>
-              <div class="col">
-                <div class="bg-light rounded-4 p-3 text-center">HTML/CSS</div>
-              </div>
-            </div>
+    .rs-pill {
+        padding: 7px 16px;
+        background: var(--bg-pill);
+        border: 1px solid var(--border);
+        border-radius: 100px;
+        font-family: 'Courier New', monospace;
+        font-size: 11px;
+        letter-spacing: 0.08em;
+        color: var(--text-muted);
+        transition: background 0.2s, border-color 0.2s, color 0.2s, transform 0.2s;
+    }
 
-          </div>
-        </div>
-      </section>
+    .rs-pill:hover {
+        background: var(--accent-glow);
+        border-color: var(--border-accent);
+        color: var(--accent);
+        transform: translateY(-1px);
+    }
 
+    /* ── ANIMATIONS ── */
+    @keyframes rs-fade {
+        from { opacity: 0; transform: translateY(16px); }
+        to   { opacity: 1; transform: translateY(0); }
+    }
+
+    /* ── RESPONSIVE ── */
+    @media (max-width: 640px) {
+        .rs-card { grid-template-columns: 1fr; }
+        .rs-card-sidebar {
+            border-right: none;
+            border-bottom: 1px solid var(--border);
+            padding: 1.25rem 1.5rem;
+        }
+        .rs-card-body { padding: 1.25rem 1.5rem; }
+        .rs-page-header { flex-direction: column; align-items: flex-start; }
+        .rs-skills-card { padding: 1.5rem; }
+    }
+  </style>
+
+  <!-- THEME TOGGLE -->
+  <button class="theme-toggle" id="themeToggle" aria-label="Toggle theme">
+    <div class="theme-toggle-thumb">
+      <svg class="icon-moon" width="10" height="10" viewBox="0 0 24 24" fill="white"><path d="M21 12.79A9 9 0 1 1 11.21 3a7 7 0 0 0 9.79 9.79z"/></svg>
+      <svg class="icon-sun" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#5b4ee0" stroke-width="2.5" stroke-linecap="round"><circle cx="12" cy="12" r="4"/><line x1="12" y1="2" x2="12" y2="4"/><line x1="12" y1="20" x2="12" y2="22"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="2" y1="12" x2="4" y2="12"/><line x1="20" y1="12" x2="22" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
     </div>
+  </button>
+
+  <div class="rs-wrap">
+
+    <!-- PAGE HEADER -->
+    <div class="rs-page-header">
+      <div>
+        <div class="rs-page-title-label">Portfolio</div>
+        <h1 class="rs-page-title">Resume.</h1>
+      </div>
+      <a class="rs-download-btn" href="https://flowcv.com/resume/slvniwl17bak" target="_blank">
+        <svg viewBox="0 0 24 24"><path d="M12 16l-5-5h3V4h4v7h3l-5 5zm-7 4h14v-2H5v2z"/></svg>
+        Download CV
+      </a>
+    </div>
+
+    <!-- EXPERIENCE -->
+    <section class="rs-section">
+      <div class="rs-section-heading">
+        <span class="rs-section-heading-text">Experience</span>
+        <div class="rs-section-heading-line"></div>
+      </div>
+
+      <div class="rs-card">
+        <div class="rs-card-sidebar">
+          <div class="rs-card-year">2025</div>
+          <div class="rs-card-role">Trainee Technical Assistant</div>
+          <div class="rs-card-org">Siliguri Institute of Technology</div>
+          <div class="rs-card-loc">Siliguri, West Bengal</div>
+        </div>
+        <div class="rs-card-body">
+          Assisted in conducting and managing lab sessions for Java, C, Python, DSA and Software Engineering. Gained hands-on experience in troubleshooting and lab management.
+        </div>
+      </div>
+
+      <div class="rs-card">
+        <div class="rs-card-sidebar">
+          <div class="rs-card-year">2025</div>
+          <div class="rs-card-role">Software Engineer</div>
+          <div class="rs-card-org">Elevate Labs</div>
+          <div class="rs-card-loc">Bengaluru</div>
+        </div>
+        <div class="rs-card-body">
+          Built Java-based applications focusing on backend logic, clean architecture and system design.
+        </div>
+      </div>
+
+      <div class="rs-card">
+        <div class="rs-card-sidebar">
+          <div class="rs-card-year">2025</div>
+          <div class="rs-card-role">Software Developer</div>
+          <div class="rs-card-org">JPMorgan Chase &amp; Co.</div>
+          <div class="rs-card-loc">New York, USA</div>
+        </div>
+        <div class="rs-card-body">
+          Worked on Kafka streaming, REST API integration, serialization with Jackson and end-to-end testing.
+        </div>
+      </div>
+
+      <div class="rs-card">
+        <div class="rs-card-sidebar">
+          <div class="rs-card-year">2024</div>
+          <div class="rs-card-role">Java Intern</div>
+          <div class="rs-card-org">InternPe</div>
+          <div class="rs-card-loc">Bangalore</div>
+        </div>
+        <div class="rs-card-body">
+          Built industry-level projects and strengthened software development fundamentals.
+        </div>
+      </div>
+    </section>
+
+    <!-- EDUCATION -->
+    <section class="rs-section">
+      <div class="rs-section-heading">
+        <span class="rs-section-heading-text">Education</span>
+        <div class="rs-section-heading-line"></div>
+      </div>
+
+      <div class="rs-card">
+        <div class="rs-card-sidebar">
+          <div class="rs-card-year">2025 – Present</div>
+          <div class="rs-card-role">MCA</div>
+          <div class="rs-card-org">Siliguri Institute of Technology</div>
+          <div class="rs-card-loc">Siliguri, West Bengal</div>
+        </div>
+        <div class="rs-card-body">
+          Learning real-world development skills with hands-on projects and system design concepts.
+        </div>
+      </div>
+    </section>
+
+    <!-- SKILLS -->
+    <section class="rs-section">
+      <div class="rs-section-heading">
+        <span class="rs-section-heading-text">Skills</span>
+        <div class="rs-section-heading-line"></div>
+      </div>
+
+      <div class="rs-skills-card">
+        <div class="rs-skills-group">
+          <div class="rs-skills-group-title">Professional</div>
+          <div class="rs-pills">
+            <span class="rs-pill">Database Management</span>
+            <span class="rs-pill">Problem Solving</span>
+            <span class="rs-pill">Web Development</span>
+          </div>
+        </div>
+        <div class="rs-skills-group">
+          <div class="rs-skills-group-title">Languages</div>
+          <div class="rs-pills">
+            <span class="rs-pill">Java</span>
+            <span class="rs-pill">Python</span>
+            <span class="rs-pill">C++</span>
+            <span class="rs-pill">JavaScript</span>
+            <span class="rs-pill">SQL</span>
+            <span class="rs-pill">HTML / CSS</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
   </div>
+
+  <script>
+    (function () {
+        var root = document.getElementById('pf-root');
+        var btn  = document.getElementById('themeToggle');
+        var saved = localStorage.getItem('pf-theme');
+        if (saved === 'light') root.setAttribute('data-theme', 'light');
+        btn.addEventListener('click', function () {
+            var isLight = root.getAttribute('data-theme') === 'light';
+            if (isLight) {
+                root.removeAttribute('data-theme');
+                localStorage.setItem('pf-theme', 'dark');
+            } else {
+                root.setAttribute('data-theme', 'light');
+                localStorage.setItem('pf-theme', 'light');
+            }
+        });
+    })();
+  </script>
+
 </div>
 </body>
 </html>
