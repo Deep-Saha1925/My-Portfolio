@@ -5,94 +5,239 @@
     <title>Contact</title>
 </head>
 <body>
-<section class="py-5" th:fragment="contact">
-    <div class="container px-5">
-        <div class="bg-light rounded-4 py-5 px-4 px-md-5">
-            <div class="text-center mb-5">
-                <div class="feature bg-primary bg-gradient-primary-to-secondary text-white rounded-3 mb-3">
-                    <i class="bi bi-envelope"></i>
-                </div>
-                <h1 class="fw-bolder">Get in touch</h1>
-                <p class="lead fw-normal text-muted mb-0">Let's work together!</p>
+
+<div th:fragment="contact" id="pf-root">
+
+    <style>
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+        /* DARK */
+        #pf-root {
+            --bg: #0a0a0f;
+            --bg-card: #111118;
+            --bg-subtle: #16161f;
+            --accent: #7c6af7;
+            --accent-2: #c084fc;
+            --accent-glow: rgba(124, 106, 247, 0.18);
+            --text: #f0eff8;
+            --text-muted: #8b8a9e;
+            --text-dim: #4a4960;
+            --border: rgba(255,255,255,0.07);
+            --border-accent: rgba(124, 106, 247, 0.35);
+        }
+
+        /* LIGHT */
+        #pf-root[data-theme="light"] {
+            --bg: #f9f8f6;
+            --bg-card: #ffffff;
+            --bg-subtle: #f0eff9;
+            --accent: #5b4ee0;
+            --accent-2: #9b59c4;
+            --accent-glow: rgba(91, 78, 224, 0.10);
+            --text: #0e0e10;
+            --text-muted: #4a4a58;
+            --text-dim: #9a9aab;
+            --border: rgba(0,0,0,0.09);
+            --border-accent: rgba(91, 78, 224, 0.30);
+        }
+
+        #pf-root {
+            background: var(--bg);
+            color: var(--text);
+            font-family: 'Georgia', serif;
+            min-height: 100vh;
+        }
+
+        /* TOGGLE */
+        .theme-toggle {
+            position: fixed;
+            top: 1.25rem;
+            right: 1.5rem;
+            width: 44px;
+            height: 26px;
+            background: var(--bg-card);
+            border: 1px solid var(--border-accent);
+            border-radius: 100px;
+            cursor: pointer;
+        }
+
+        .theme-toggle-thumb {
+            position: absolute;
+            top: 3px;
+            left: 3px;
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            background: var(--accent);
+            transition: transform 0.3s;
+        }
+
+        #pf-root[data-theme="light"] .theme-toggle-thumb {
+            transform: translateX(18px);
+        }
+
+        /* LAYOUT */
+        .ct-wrap {
+            max-width: 700px;
+            margin: auto;
+            padding: 6rem 1.5rem;
+        }
+
+        /* HEADER */
+        .ct-header {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+
+        .ct-title {
+            font-size: 3rem;
+            font-style: italic;
+        }
+
+        .ct-sub {
+            color: var(--text-muted);
+            margin-top: 0.5rem;
+        }
+
+        /* FORM CARD */
+        .ct-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 2rem;
+        }
+
+        .ct-input {
+            width: 100%;
+            padding: 14px;
+            margin-bottom: 1rem;
+            background: var(--bg-subtle);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            color: var(--text);
+        }
+
+        .ct-input:focus {
+            outline: none;
+            border-color: var(--accent);
+        }
+
+        textarea.ct-input {
+            height: 140px;
+            resize: none;
+        }
+
+        /* BUTTON */
+        .ct-btn {
+            width: 100%;
+            padding: 14px;
+            background: var(--accent);
+            border: none;
+            color: white;
+            font-family: 'Courier New', monospace;
+            letter-spacing: 0.1em;
+            cursor: pointer;
+            border-radius: 8px;
+        }
+
+        .ct-btn:hover {
+            background: var(--accent-2);
+        }
+
+        .msg {
+            text-align: center;
+            margin-top: 1rem;
+            display: none;
+        }
+
+        .success { color: #4ade80; }
+        .error { color: #f87171; }
+
+    </style>
+
+    <!-- THEME TOGGLE -->
+    <button class="theme-toggle" id="themeToggle">
+        <div class="theme-toggle-thumb"></div>
+    </button>
+
+    <section>
+        <div class="ct-wrap">
+
+            <!-- HEADER -->
+            <div class="ct-header">
+                <h1 class="ct-title">Get in touch.</h1>
+                <p class="ct-sub">Let's build something together.</p>
             </div>
 
-            <div class="row gx-5 justify-content-center">
-                <div class="col-lg-8 col-xl-6">
-                    <form id="contactForm">
-                        <!-- Name -->
-                        <div class="form-floating mb-3">
-                            <input class="form-control" id="name" name="name" type="text" placeholder="Enter your name..." />
-                            <label for="name">Full name</label>
-                            <div class="invalid-feedback">A name is required.</div>
-                        </div>
+            <!-- FORM -->
+            <div class="ct-card">
+                <form id="contactForm">
 
-                        <!-- Email -->
-                        <div class="form-floating mb-3">
-                            <input class="form-control" id="email" name="email" type="email" placeholder="name@example.com" />
-                            <label for="email">Email address</label>
-                            <div class="invalid-feedback">A valid email is required.</div>
-                        </div>
+                    <input class="ct-input" id="name" placeholder="Full name" />
+                    <input class="ct-input" id="email" type="email" placeholder="Your Email address" />
+                    <input class="ct-input" id="phone" placeholder="Your Phone number" />
+                    <textarea class="ct-input" id="message" placeholder="Your message"></textarea>
 
-                        <!-- Phone -->
-                        <div class="form-floating mb-3">
-                            <input class="form-control" id="phone" name="phone" type="tel" placeholder="(123) 456-7890" />
-                            <label for="phone">Phone number</label>
-                            <div class="invalid-feedback">A phone number is required.</div>
-                        </div>
+                    <button class="ct-btn" type="submit">Send Message →</button>
 
-                        <!-- Message -->
-                        <div class="form-floating mb-3">
-                            <textarea class="form-control" id="message" name="message" placeholder="Enter your message..." style="height: 10rem"></textarea>
-                            <label for="message">Message</label>
-                            <div class="invalid-feedback">A message is required.</div>
-                        </div>
+                    <div class="msg success" id="successMsg">Message sent successfully!</div>
+                    <div class="msg error" id="errorMsg">Error sending message!</div>
 
-                        <div class="d-none text-success text-center mb-3" id="submitSuccessMessage">Form submission successful!</div>
-                        <div class="d-none text-danger text-center mb-3" id="submitErrorMessage">Error sending message!</div>
-
-                        <!-- Button -->
-                        <div class="d-grid">
-                            <button class="btn btn-primary btn-lg" id="submitButton" type="submit">Submit</button>
-                        </div>
-                    </form>
-                </div>
+                </form>
             </div>
+
         </div>
-    </div>
-
+    </section>
 
     <script>
+        // THEME TOGGLE
+        (function () {
+            var root = document.getElementById('pf-root');
+            var btn = document.getElementById('themeToggle');
 
-        document.addEventListener("DOMContentLoaded", function () {
+            var saved = localStorage.getItem('pf-theme');
+            if (saved === 'light') root.setAttribute('data-theme', 'light');
 
-          const form = document.getElementById("contactForm");
+            btn.addEventListener('click', function () {
+                var isLight = root.getAttribute('data-theme') === 'light';
+                if (isLight) {
+                    root.removeAttribute('data-theme');
+                    localStorage.setItem('pf-theme', 'dark');
+                } else {
+                    root.setAttribute('data-theme', 'light');
+                    localStorage.setItem('pf-theme', 'light');
+                }
+            });
+        })();
 
-          form.addEventListener("submit", async function (e) {
+        // FORM SUBMIT
+        document.getElementById("contactForm").addEventListener("submit", async function (e) {
             e.preventDefault();
 
             const data = {
-              name: document.getElementById("name").value,
-              email: document.getElementById("email").value,
-              phone: document.getElementById("phone").value,
-              message: document.getElementById("message").value
+                name: document.getElementById("name").value,
+                email: document.getElementById("email").value,
+                phone: document.getElementById("phone").value,
+                message: document.getElementById("message").value
             };
 
-            const response = await fetch("/send-message", {
-              method: "POST",
-              headers: { "Content-Type": "application/json" },
-              body: JSON.stringify(data)
+            const res = await fetch("/send-message", {
+                method: "POST",
+                headers: {"Content-Type": "application/json"},
+                body: JSON.stringify(data)
             });
 
-            if (response.ok) {
-              document.getElementById("submitSuccessMessage").classList.remove("d-none");
-              form.reset();
+            if (res.ok) {
+                successMsg.style.display = "block";
+                errorMsg.style.display = "none";
+                this.reset();
             } else {
-              document.getElementById("submitErrorMessage").classList.remove("d-none");
+                errorMsg.style.display = "block";
+                successMsg.style.display = "none";
             }
-          });
         });
     </script>
 
-</section>
+</div>
 </body>
 </html>
