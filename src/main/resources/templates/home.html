@@ -2,11 +2,12 @@
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head></head>
 <body>
-<header th:fragment="home">
+<header th:fragment="home" id="pf-root">
     <style>
         *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-        :root {
+        /* ── DARK (default) ── */
+        #pf-root {
             --bg: #0a0a0f;
             --bg-card: #111118;
             --bg-subtle: #16161f;
@@ -22,13 +23,78 @@
             --radius-sm: 8px;
         }
 
+        /* ── LIGHT ── */
+        #pf-root[data-theme="light"] {
+            --bg: #f9f8f6;
+            --bg-card: #ffffff;
+            --bg-subtle: #f0eff9;
+            --accent: #5b4ee0;
+            --accent-2: #9b59c4;
+            --accent-glow: rgba(91, 78, 224, 0.10);
+            --text: #0e0e10;
+            --text-muted: #4a4a58;
+            --text-dim: #9a9aab;
+            --border: rgba(0,0,0,0.09);
+            --border-accent: rgba(91, 78, 224, 0.30);
+        }
+
         body {
             background: var(--bg);
             color: var(--text);
             font-family: 'Georgia', 'Times New Roman', serif;
             min-height: 100vh;
             overflow-x: hidden;
+            transition: background 0.3s ease, color 0.3s ease;
         }
+
+        /* ── THEME TOGGLE BUTTON ── */
+        .theme-toggle {
+            position: fixed;
+            top: 1.25rem;
+            right: 1.5rem;
+            z-index: 999;
+            width: 44px;
+            height: 26px;
+            background: var(--bg-card);
+            border: 1px solid var(--border-accent);
+            border-radius: 100px;
+            cursor: pointer;
+            padding: 0;
+            transition: background 0.3s, border-color 0.3s;
+            outline: none;
+        }
+
+        .theme-toggle:focus-visible {
+            box-shadow: 0 0 0 3px var(--accent-glow);
+        }
+
+        .theme-toggle-thumb {
+            position: absolute;
+            top: 3px;
+            left: 3px;
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            background: var(--accent);
+            transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), background 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 10px;
+            line-height: 1;
+        }
+
+        #pf-root[data-theme="light"] .theme-toggle-thumb {
+            transform: translateX(18px);
+        }
+
+        /* icons inside thumb */
+        .icon-moon, .icon-sun { position: absolute; transition: opacity 0.2s; }
+        .icon-moon { opacity: 1; }
+        .icon-sun  { opacity: 0; }
+
+        #pf-root[data-theme="light"] .icon-moon { opacity: 0; }
+        #pf-root[data-theme="light"] .icon-sun  { opacity: 1; }
 
         /* ── HEADER HERO ── */
         .hero {
@@ -38,9 +104,10 @@
             position: relative;
             padding: 6rem 2rem 4rem;
             overflow: hidden;
+            background: var(--bg);
+            transition: background 0.3s ease;
         }
 
-        /* grid noise background */
         .hero::before {
             content: '';
             position: absolute;
@@ -52,7 +119,12 @@
             mask-image: radial-gradient(ellipse 80% 80% at 50% 0%, black 40%, transparent 100%);
         }
 
-        /* radial glow */
+        #pf-root[data-theme="light"] .hero::before {
+            background-image:
+                linear-gradient(rgba(91,78,224,0.05) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(91,78,224,0.05) 1px, transparent 1px);
+        }
+
         .hero::after {
             content: '';
             position: absolute;
@@ -76,7 +148,6 @@
             z-index: 1;
         }
 
-        /* ── BADGE ── */
         .badge {
             display: inline-flex;
             align-items: center;
@@ -92,6 +163,7 @@
             background: rgba(124,106,247,0.08);
             margin-bottom: 2rem;
             animation: fade-up 0.6s ease both;
+            transition: color 0.3s, border-color 0.3s, background 0.3s;
         }
 
         .badge::before {
@@ -101,6 +173,7 @@
             border-radius: 50%;
             background: var(--accent);
             animation: pulse 2s ease-in-out infinite;
+            transition: background 0.3s;
         }
 
         @keyframes pulse {
@@ -108,7 +181,6 @@
             50% { opacity: 0.4; transform: scale(0.8); }
         }
 
-        /* ── HEADING ── */
         .eyebrow {
             font-family: 'Courier New', monospace;
             font-size: 13px;
@@ -116,6 +188,7 @@
             letter-spacing: 0.05em;
             margin-bottom: 1rem;
             animation: fade-up 0.6s 0.1s ease both;
+            transition: color 0.3s;
         }
 
         .hero-title {
@@ -126,6 +199,7 @@
             color: var(--text);
             margin-bottom: 1.5rem;
             animation: fade-up 0.7s 0.15s ease both;
+            transition: color 0.3s;
         }
 
         .hero-title em {
@@ -144,9 +218,9 @@
             margin-bottom: 2.5rem;
             font-family: 'Georgia', serif;
             animation: fade-up 0.7s 0.2s ease both;
+            transition: color 0.3s;
         }
 
-        /* ── BUTTONS ── */
         .hero-btns {
             display: flex;
             gap: 1rem;
@@ -167,15 +241,10 @@
             font-size: 13px;
             letter-spacing: 0.05em;
             font-weight: 600;
-            transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
-            position: relative;
-            overflow: hidden;
+            transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.3s ease;
         }
 
-        .btn-primary::after {
-            content: '→';
-            transition: transform 0.2s ease;
-        }
+        .btn-primary::after { content: '→'; transition: transform 0.2s ease; }
 
         .btn-primary:hover {
             background: #6b59e8;
@@ -183,9 +252,7 @@
             box-shadow: 0 8px 32px rgba(124,106,247,0.35);
         }
 
-        .btn-primary:hover::after {
-            transform: translateX(3px);
-        }
+        .btn-primary:hover::after { transform: translateX(3px); }
 
         .btn-outline {
             display: inline-flex;
@@ -200,7 +267,7 @@
             font-family: 'Courier New', monospace;
             font-size: 13px;
             letter-spacing: 0.05em;
-            transition: border-color 0.2s ease, background 0.2s ease, transform 0.2s ease;
+            transition: border-color 0.2s ease, background 0.2s ease, transform 0.2s ease, color 0.3s;
         }
 
         .btn-outline::after {
@@ -216,12 +283,9 @@
             transform: translateY(-2px);
         }
 
-        .btn-outline:hover::after {
-            color: var(--accent);
-            transform: translate(2px, -2px);
-        }
+        .btn-outline:hover::after { color: var(--accent); transform: translate(2px, -2px); }
 
-        /* ── PROFILE VISUAL ── */
+        /* ── PROFILE ── */
         .profile-frame {
             position: relative;
             display: flex;
@@ -236,7 +300,6 @@
             height: 380px;
         }
 
-        /* spinning dashed ring */
         .profile-ring::before {
             content: '';
             position: absolute;
@@ -244,9 +307,9 @@
             border-radius: 50%;
             border: 1px dashed var(--border-accent);
             animation: spin 18s linear infinite;
+            transition: border-color 0.3s;
         }
 
-        /* static glow ring */
         .profile-ring::after {
             content: '';
             position: absolute;
@@ -257,9 +320,7 @@
             animation: spin 6s linear infinite reverse;
         }
 
-        @keyframes spin {
-            to { transform: rotate(360deg); }
-        }
+        @keyframes spin { to { transform: rotate(360deg); } }
 
         .profile-img-wrap {
             position: absolute;
@@ -268,6 +329,7 @@
             overflow: hidden;
             z-index: 1;
             border: 3px solid var(--bg-card);
+            transition: border-color 0.3s;
         }
 
         .profile-img-wrap img {
@@ -277,7 +339,6 @@
             object-position: top center;
         }
 
-        /* floating stat cards */
         .stat-card {
             position: absolute;
             background: var(--bg-card);
@@ -287,6 +348,7 @@
             z-index: 2;
             backdrop-filter: blur(12px);
             animation: float 4s ease-in-out infinite;
+            transition: background 0.3s, border-color 0.3s;
         }
 
         .stat-card:nth-child(2) { animation-delay: -2s; }
@@ -297,6 +359,7 @@
             letter-spacing: 0.1em;
             color: var(--text-dim);
             text-transform: uppercase;
+            transition: color 0.3s;
         }
 
         .stat-card-val {
@@ -304,30 +367,25 @@
             font-weight: 700;
             color: var(--accent);
             font-family: 'Courier New', monospace;
+            transition: color 0.3s;
         }
 
-        .stat-card-left {
-            left: -30px;
-            top: 40%;
-        }
-
-        .stat-card-right {
-            right: -30px;
-            bottom: 30%;
-        }
+        .stat-card-left { left: -30px; top: 40%; }
+        .stat-card-right { right: -30px; bottom: 30%; }
 
         @keyframes float {
             0%, 100% { transform: translateY(0); }
             50% { transform: translateY(-8px); }
         }
 
-        /* ── ABOUT SECTION ── */
+        /* ── ABOUT ── */
         .about {
             background: var(--bg-subtle);
             padding: 6rem 2rem;
             position: relative;
             border-top: 1px solid var(--border);
             border-bottom: 1px solid var(--border);
+            transition: background 0.3s, border-color 0.3s;
         }
 
         .about::before {
@@ -339,6 +397,7 @@
             font-size: 11px;
             letter-spacing: 0.15em;
             color: var(--text-dim);
+            transition: color 0.3s;
         }
 
         .about-inner {
@@ -357,6 +416,7 @@
             color: var(--accent);
             text-transform: uppercase;
             margin-bottom: 1rem;
+            transition: color 0.3s;
         }
 
         .about-heading {
@@ -364,6 +424,8 @@
             font-weight: 400;
             line-height: 1.1;
             letter-spacing: -0.02em;
+            color: var(--text);
+            transition: color 0.3s;
         }
 
         .about-heading em {
@@ -381,6 +443,7 @@
             margin-bottom: 1rem;
             font-family: 'Courier New', monospace;
             letter-spacing: 0.05em;
+            transition: color 0.3s;
         }
 
         .about-text {
@@ -388,14 +451,10 @@
             color: var(--text-muted);
             line-height: 1.8;
             margin-bottom: 2.5rem;
+            transition: color 0.3s;
         }
 
-        /* ── SOCIAL LINKS ── */
-        .social-links {
-            display: flex;
-            gap: 12px;
-            flex-wrap: wrap;
-        }
+        .social-links { display: flex; gap: 12px; flex-wrap: wrap; }
 
         .social-link {
             display: inline-flex;
@@ -419,12 +478,7 @@
             transform: translateY(-2px);
         }
 
-        .social-link svg {
-            width: 14px;
-            height: 14px;
-            fill: currentColor;
-            flex-shrink: 0;
-        }
+        .social-link svg { width: 14px; height: 14px; fill: currentColor; flex-shrink: 0; }
 
         /* ── ANIMATIONS ── */
         @keyframes fade-up {
@@ -434,11 +488,7 @@
 
         /* ── RESPONSIVE ── */
         @media (max-width: 900px) {
-            .hero-inner {
-                grid-template-columns: 1fr;
-                gap: 3rem;
-                text-align: center;
-            }
+            .hero-inner { grid-template-columns: 1fr; gap: 3rem; text-align: center; }
             .hero-sub { margin-left: auto; margin-right: auto; }
             .hero-btns { justify-content: center; }
             .profile-ring { width: 280px; height: 280px; }
@@ -449,10 +499,31 @@
         }
     </style>
 
-    <!-- ── HERO ── -->
+    <!-- THEME TOGGLE -->
+    <button class="theme-toggle" id="themeToggle" aria-label="Toggle theme" title="Toggle light / dark mode">
+        <div class="theme-toggle-thumb">
+            <!-- Moon icon (dark mode) -->
+            <svg class="icon-moon" width="10" height="10" viewBox="0 0 24 24" fill="white" xmlns="http://www.w3.org/2000/svg">
+                <path d="M21 12.79A9 9 0 1 1 11.21 3a7 7 0 0 0 9.79 9.79z"/>
+            </svg>
+            <!-- Sun icon (light mode) -->
+            <svg class="icon-sun" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#5b4ee0" stroke-width="2.5" stroke-linecap="round" xmlns="http://www.w3.org/2000/svg">
+                <circle cx="12" cy="12" r="4"/>
+                <line x1="12" y1="2" x2="12" y2="4"/>
+                <line x1="12" y1="20" x2="12" y2="22"/>
+                <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/>
+                <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/>
+                <line x1="2" y1="12" x2="4" y2="12"/>
+                <line x1="20" y1="12" x2="22" y2="12"/>
+                <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/>
+                <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
+            </svg>
+        </div>
+    </button>
+
+    <!-- HERO -->
     <section class="hero">
         <div class="hero-inner">
-            <!-- Left: text -->
             <div>
                 <div class="badge">Design · Development · Marketing</div>
                 <p class="eyebrow">I can help your business to</p>
@@ -464,7 +535,6 @@
                 </div>
             </div>
 
-            <!-- Right: profile visual -->
             <div class="profile-frame">
                 <div class="profile-ring">
                     <div class="profile-img-wrap">
@@ -483,7 +553,7 @@
         </div>
     </section>
 
-    <!-- ── ABOUT ── -->
+    <!-- ABOUT -->
     <section class="about">
         <div class="about-inner">
             <div>
@@ -510,6 +580,28 @@
             </div>
         </div>
     </section>
+
+    <script>
+        (function () {
+            var root = document.getElementById('pf-root');
+            var btn  = document.getElementById('themeToggle');
+
+            // restore saved preference
+            var saved = localStorage.getItem('pf-theme');
+            if (saved === 'light') root.setAttribute('data-theme', 'light');
+
+            btn.addEventListener('click', function () {
+                var isLight = root.getAttribute('data-theme') === 'light';
+                if (isLight) {
+                    root.removeAttribute('data-theme');
+                    localStorage.setItem('pf-theme', 'dark');
+                } else {
+                    root.setAttribute('data-theme', 'light');
+                    localStorage.setItem('pf-theme', 'light');
+                }
+            });
+        })();
+    </script>
 
 </header>
 </body>
