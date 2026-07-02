@@ -19,7 +19,6 @@ public class EmailService {
         mail.setTo("yt9889712@gmail.com");
         mail.setSubject("New Contact form submission from " + name);
         mail.setReplyTo(email);
-
         mail.setText(
                 "You have received a new message from your portfolio:\n\n" +
                         "Name: " + name + "\n" +
@@ -27,7 +26,6 @@ public class EmailService {
                         "Phone: " + phone + "\n\n" +
                         "Message:\n" + message
         );
-
         mailSender.send(mail);
     }
 }
